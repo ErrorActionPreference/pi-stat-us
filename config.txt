@@ -61,15 +61,15 @@ hdmi_force_hotplug=1
 # Added by Silently Continue
 
 # Green
-gpio=17=op,dh
-gpio=22=op,dh
-gpio=9=op,dh
-gpio=5=op,dh
-gpio=13=op,dh
+# gpio=17=op,dh
+# gpio=22=op,dh
+# gpio=9=op,dh
+# gpio=5=op,dh
+# gpio=13=op,dh
 
 # Red
 gpio=4=op,dh
-gpio=27=op,dh
+# gpio=27=op,dh
 gpio=10=op,dh
-gpio=11=op,dh
+# gpio=11=op,dh
 gpio=6=op,dh
