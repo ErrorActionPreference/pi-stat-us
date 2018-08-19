@@ -7,7 +7,6 @@ from time import sleep
 def is_website_up(url):
     try:
         r = requests.get(url)
-        print(url, r.ok)
         return r.ok
     except:
         return false
@@ -17,7 +16,6 @@ def website_up(url):
     while True:
         try:
             r = requests.get(url)
-            print(url, r.ok)
             yield r.ok
         except:
             yield False
@@ -30,16 +28,28 @@ def pulse_leds(leds, fade_in=1.0, fade_out=1.0, pause=0.0):
             sleep(pause)
 
 
+def switch_leds(strip, green):
+    red_led = strip.lights.red
+    green_led = strip.lights.green
+
+    if green:
+        green_led.on()
+        red_led.off()
+    else:
+        green_led.off()
+        red_led.on()
+
+
 green_leds = LEDBoard(17, 22, 9, 5, 13, pwm=True)
 red_leds = LEDBoard(4, 27, 10, 11, 6, pwm=True)
 
 red_leds.off()
 green_leds.off()
 
-# Pulse red leds on
+# Pulse red LEDs on
 pulse_leds(red_leds)
 
-sleep(2)
+sleep(3)
 
 # Swoosh up down
 fade_in = 0
@@ -50,27 +60,12 @@ for repeat in range(5):
     pulse_leds(red_leds, fade_in, fade_out, pause)
     pulse_leds(reversed(red_leds), fade_in, fade_out, pause)
 
-# Detect web sites
-green_led = green_leds[0]
-red_led = red_leds[0]
-
-green_led.blink(0.5, 0.5)
-sleep(3)
-if is_website_up('https://google.com'):
-    green_led.on()
-    red_led.off()
-else:
-    green_led.off()
-    red_led.on()
-
-while True:
-    # Do nothing
-    pass
-
 red_leds.close()
 green_leds.close()
 
+# Detect web sites
 status_board = StatusBoard('google', 'stackoverflow', 'github', 'azure', 'granta', )
+
 statuses = {
     status_board.google: 'https://google.com/',
     status_board.stackoverflow: 'https://stackoverflow.com/',
@@ -78,3 +73,15 @@ statuses = {
     status_board.azure: 'https://azure.microsoft.com/',
     status_board.granta: 'https://grantadesign.com/',
 }
+
+while True:
+    for strip, url in statuses.items():
+        if strip.lights.red.is_lit:
+            current_led = strip.lights.red
+        else:
+            current_led = strip.lights.green
+
+        current_led.blink(0.5, 0.5, 12, False)
+
+        switch_leds(strip, is_website_up(url))
+
