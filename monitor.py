@@ -1,9 +1,41 @@
+from gpiozero import LEDBoard
 from gpiozero import StatusBoard
-from gpiozero.tools import negated, smoothed
 import requests
 from time import sleep
 
-sb = StatusBoard('google', 'stackoverflow', 'github', 'azure', 'granta')
+
+pause = .25
+fade = .7
+
+# green_leds = LEDBoard(17, 22, 9, 5, 13, pwm=True)
+red_leds = LEDBoard(4, 27, 10, 11, 6, pwm=True)
+
+red_leds.off()
+red_leds.pulse(fade,  fade, 1, False)
+sleep(pause)
+
+for repeat in range(5):
+    for led in red_leds:
+        led.pulse(0, fade, 1, True)
+        sleep(pause)
+
+    for led in reversed(red_leds):
+        led.pulse(0, fade, 1, True)
+        sleep(pause)
+
+
+red_leds.close()
+
+
+status_board = StatusBoard('google', 'stackoverflow', 'github', 'azure', 'granta', )
+
+def is_website_up(url):
+    try:
+        r = requests.get(url)
+        print(url, r.ok)
+        return r.ok
+    except:
+        return false
 
 def website_up(url):
     while True:
@@ -15,21 +47,9 @@ def website_up(url):
             yield False
 
 statuses = {
-    sb.google: website_up('https://google.com/'),
-    sb.stackoverflow: website_up('https://stackoverflow.com/'),
-    sb.github: website_up('https://github.com/ErrorActionPreference/'),
-    sb.azure: website_up('https://azure.microsoft.com/'),
-    sb.granta: website_up('https://grantadesign.com/'),
+    status_board.google:        'https://google.com/',
+    status_board.stackoverflow: 'https://stackoverflow.com/',
+    status_board.github:        'https://github.com/ErrorActionPreference/',
+    status_board.azure:         'https://azure.microsoft.com/',
+    status_board.granta:        'https://grantadesign.com/',
 }
-
-for strip, website in statuses.items():
-    strip.lights.green.source = smoothed(website, 2, any)  # allow 1 false negative out of 2
-    strip.lights.green.source_delay = 60
-
-    strip.lights.red.source = negated(strip.lights.green.values)
-    strip.lights.red.source_delay = 60
-
-
-
-input()
-
