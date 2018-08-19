@@ -4,27 +4,28 @@ import requests
 from time import sleep
 
 
-pause = .25
-fade = .7
+def pulse_leds(leds, fade_in=0, fade_out=0.7, pause=.25):
+    for led in leds:
+        led.pulse(fade_in, fade_out, 1, True)
+        if pause > 0:
+            sleep(pause)
 
-# green_leds = LEDBoard(17, 22, 9, 5, 13, pwm=True)
+green_leds = LEDBoard(17, 22, 9, 5, 13, pwm=True)
 red_leds = LEDBoard(4, 27, 10, 11, 6, pwm=True)
 
 red_leds.off()
-red_leds.pulse(fade,  fade, 1, False)
-sleep(pause)
+green_leds.off()
+
+pulse_leds(red_leds, fade_in=2, pause=0)
+
+sleep(1)
 
 for repeat in range(5):
-    for led in red_leds:
-        led.pulse(0, fade, 1, True)
-        sleep(pause)
-
-    for led in reversed(red_leds):
-        led.pulse(0, fade, 1, True)
-        sleep(pause)
-
+    pulse_leds(red_leds)
+    pulse_leds(reversed(red_leds))
 
 red_leds.close()
+green_leds.close()
 
 
 status_board = StatusBoard('google', 'stackoverflow', 'github', 'azure', 'granta', )
