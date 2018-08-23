@@ -9,17 +9,7 @@ def is_website_up(url):
         r = requests.get(url)
         return r.ok
     except:
-        return false
-
-
-def website_up(url):
-    while True:
-        try:
-            r = requests.get(url)
-            yield r.ok
-        except:
-            yield False
-
+        return False
 
 def pulse_leds(leds, fade_in=1.0, fade_out=1.0, pause=0.0):
     for led in leds:
@@ -64,24 +54,26 @@ red_leds.close()
 green_leds.close()
 
 # Detect web sites
-status_board = StatusBoard('google', 'stackoverflow', 'github', 'azure', 'granta', )
+status_board = StatusBoard()
 
-statuses = {
-    status_board.google: 'https://google.com/',
-    status_board.stackoverflow: 'https://stackoverflow.com/',
-    status_board.github: 'https://github.com/ErrorActionPreference/',
-    status_board.azure: 'https://azure.microsoft.com/',
-    status_board.granta: 'https://grantadesign.com/',
-}
+urls = [
+    'https://google.com/',
+    'https://stackoverflow.com/',
+    'https://github.com/ErrorActionPreference/',
+    'https://azure.microsoft.com/',
+    'https://grantadesign.com/',
+]
 
 while True:
-    for strip, url in statuses.items():
+    for n in reversed(range(len(urls))):
+        strip = status_board[n]
+        url = urls[n]
         if strip.lights.red.is_lit:
             current_led = strip.lights.red
         else:
             current_led = strip.lights.green
 
-        current_led.blink(0.5, 0.5, 12, False)
+        current_led.blink(0.1, 0.1)
 
         switch_leds(strip, is_website_up(url))
-
+    sleep(60)
