@@ -73,3 +73,7 @@ gpio=4=op,dh
 gpio=10=op,dh
 # gpio=11=op,dh
 gpio=6=op,dh
+
+# Disable the PWR LED.
+dtparam=pwr_led_trigger=none
+dtparam=pwr_led_activelow=off
