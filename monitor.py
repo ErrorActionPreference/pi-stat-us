@@ -4,14 +4,15 @@ import requests
 from time import sleep
 
 
-def is_website_up(url):
+def is_website_up(url, trigger_text=None):
     """
-    Check that a website is responding without error.
+    Check that a website is responding without error and does not contain trigger_test
     :param url: URL to check
     :return: True if 200 response is received - False in all other circumstances
     """
     try:
-        r = requests.get(url)
+        # will allow redirects
+        r = requests.head(url)
         return r.ok
     except:
         return False
@@ -63,9 +64,9 @@ def test_sequence():
         red_leds.off()
         green_leds.off()
 
-        # Pulse greed LEDs on
-        pulse_leds(red_leds)
-        sleep(3)
+        # Pulse green LEDs on
+        # pulse_leds(green_leds)
+        # sleep(3)
 
         # Pulse red LEDs on
         pulse_leds(red_leds)
@@ -91,7 +92,7 @@ def monitor_websites():
         'https://google.com/',
         'https://stackoverflow.com/',
         'https://github.com/ErrorActionPreference/',
-        'https://azure.microsoft.com/',
+        'https://azure.microsoft.com/en-us/status/feed/',
         'https://grantadesign.com/',
     ]
 
@@ -104,6 +105,7 @@ def monitor_websites():
                 strip = status_board[n]
                 url = urls[n]
 
+                #  Flash the currently lit LED to indicate activity
                 if strip.lights.red.is_lit:
                     current_led = strip.lights.red
                 else:
@@ -111,6 +113,7 @@ def monitor_websites():
 
                 current_led.blink(0.1, 0.1)
 
+                #  Check the website
                 switch_leds(strip, is_website_up(url))
 
             sleep(60)
