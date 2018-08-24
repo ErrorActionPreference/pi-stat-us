@@ -28,7 +28,6 @@ def is_website_up(url, error_text=None):
             return r.text.find(error_text) == -1
 
     except:
-        e = sys.exc_info()[0]
         return False
 
 
@@ -91,7 +90,7 @@ def launch_sequence():
             pulse_leds(reversed(red_leds), fade_in, fade_out, pause)
 
 
-def update_strip_status(strip, url):
+def update_strip_status(strip, url, error_text):
     """
     Update the leds on the strip to indicate the status of the given url
     :param strip: StatusBoard strip to update
@@ -104,7 +103,7 @@ def update_strip_status(strip, url):
         current_led = strip.lights.green
     current_led.blink(0.1, 0.1)
     #  Check the website
-    switch_leds(strip, is_website_up(url, "Software Engineer"))
+    switch_leds(strip, is_website_up(url, error_text))
 
 
 def monitor_websites():
@@ -112,23 +111,29 @@ def monitor_websites():
     Continuously update the led to reflect status of websites.
     """
     urls = [
-        'https://google.com/',
-        'https://stackoverflow.com/',
-        'https://github.com/ErrorActionPreference/',
-        'https://azure.microsoft.com/en-us/status/feed/',
-        'https://grantadesign.com/',
+        ('https://google.com/', None),
+        ('https://stackoverflow.com/', None),
+        ('https://github.com/ErrorActionPreference/', None),
+        ('https://azure.microsoft.com/en-us/status/feed/', 'UK South'),
+        ('https://grantadesign.com/', 'Software Engineer'),
     ]
 
     with StatusBoard() as status_board:
+        #  Status board is upside down so run from top to bottom
+        updates = [
+            (status_board.five, 'https://www.google.com/', None),
+            (status_board.four, 'https://stackoverflow.com/', None),
+            (status_board.three, 'https://github.com/ErrorActionPreference/', None),
+            (status_board.two, 'https://azure.microsoft.com/en-us/status/feed/', 'UK South'),
+            (status_board.one, 'https://grantadesign.workable.com/', 'Software Engineer'),
+        ]
+
         while True:
-            #  Status board is upside down so run from top to bottom
-            for n in reversed(range(len(urls))):
-                strip = status_board[n]
-                url = urls[n]
+            for strip, url, error_text in updates:
+                update_strip_status(strip, url, error_text)
+                sleep(6)
 
-                update_strip_status(strip, url)
-
-            sleep(60)
+            sleep(30)
 
 
 if __name__ == "__main__":
